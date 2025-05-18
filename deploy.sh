@@ -210,8 +210,17 @@ fi
 echo_message "Setting backend permissions..."
 chown -R $PRODUCTION_USER:$PRODUCTION_GROUP $PRODUCTION_BACKEND_DIR
 chmod -R 755 $PRODUCTION_BACKEND_DIR
+
+# Ensure storage and cache directories are writable by the web server
+echo_message "Setting storage and cache directory permissions..."
 chmod -R 775 $PRODUCTION_BACKEND_DIR/storage
+find $PRODUCTION_BACKEND_DIR/storage -type d -exec chmod 775 {} \;
+find $PRODUCTION_BACKEND_DIR/storage -type f -exec chmod 664 {} \;
 chmod -R 775 $PRODUCTION_BACKEND_DIR/bootstrap/cache
+
+# Make sure the web server user owns these directories
+chown -R $PRODUCTION_USER:$PRODUCTION_GROUP $PRODUCTION_BACKEND_DIR/storage
+chown -R $PRODUCTION_USER:$PRODUCTION_GROUP $PRODUCTION_BACKEND_DIR/bootstrap/cache
 
 echo_message "Clearing Laravel cache..."
 php artisan cache:clear
