@@ -133,7 +133,7 @@ class DailyMotionService
             
             // Create a download URL using the public route
             $existingFilename = basename($existingFile);
-            $downloadUrl = url("/api/tools/media/download/{$existingFilename}");
+            $downloadUrl = url("/tools/media/download/{$existingFilename}");
             
             return [
                 'success' => true,

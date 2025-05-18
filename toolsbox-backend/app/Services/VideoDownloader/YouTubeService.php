@@ -210,7 +210,7 @@ class YouTubeService
                 
                 // Create a download URL using the public route
                 $filename = basename($existingFile, '.' . $extension);
-                $downloadUrl = url("/api/tools/media/download/{$filename}.{$extension}");
+                $downloadUrl = url("/tools/media/download/{$filename}.{$extension}");
                 
                 return [
                     'success' => true,
@@ -242,7 +242,9 @@ class YouTubeService
                 // Download only the audio stream in its native format (usually webm)
                 // -f bestaudio selects only audio streams, avoiding video download entirely
                 // --rm-cache-dir removes temporary files
-                $ytdlpCommand = "yt-dlp -f 'bestaudio' --rm-cache-dir 'https://www.youtube.com/watch?v={$videoId}' -o '{$outputFile}' --no-playlist --no-check-certificate";
+                // --cookies-from-browser chrome gets cookies from Chrome to bypass anti-bot protection
+                $cookiesOption = $this->getCookiesOption();
+                $ytdlpCommand = "yt-dlp -f 'bestaudio' {$cookiesOption} --rm-cache-dir 'https://www.youtube.com/watch?v={$videoId}' -o '{$outputFile}' --no-playlist --no-check-certificate";
             } else {
                 // For video formats, ensure we get both video and audio
                 // Use format selection that combines best video with best audio
@@ -256,23 +258,28 @@ class YouTubeService
                 if ($isNumericFormatId) {
                     // If we have a specific format ID, use it exactly as specified
                     Log::info("Using exact format ID: {$actualFormatId}");
-                    $ytdlpCommand = "yt-dlp -f '{$actualFormatId}+bestaudio/best' 'https://www.youtube.com/watch?v={$videoId}' -o '{$outputFile}' --merge-output-format mp4 --no-playlist --no-check-certificate";
+                    $cookiesOption = $this->getCookiesOption();
+                    $ytdlpCommand = "yt-dlp -f '{$actualFormatId}+bestaudio/best' {$cookiesOption} 'https://www.youtube.com/watch?v={$videoId}' -o '{$outputFile}' --merge-output-format mp4 --no-playlist --no-check-certificate";
                 } else if ($format === 'mp4_4k' || $format === 'mp4_628') {
                     // 4K quality with audio, preferring mp4 container
                     Log::info("Using 4K quality format");
-                    $ytdlpCommand = "yt-dlp -f 'bestvideo[height>=2160]+bestaudio/best[height>=2160]' 'https://www.youtube.com/watch?v={$videoId}' -o '{$outputFile}' --merge-output-format mp4 --no-playlist --no-check-certificate";
+                    $cookiesOption = $this->getCookiesOption();
+                    $ytdlpCommand = "yt-dlp -f 'bestvideo[height>=2160]+bestaudio/best[height>=2160]' {$cookiesOption} 'https://www.youtube.com/watch?v={$videoId}' -o '{$outputFile}' --merge-output-format mp4 --no-playlist --no-check-certificate";
                 } elseif ($format === 'mp4_hd') {
                     // HD quality with audio, preferring mp4 container
                     Log::info("Using HD quality format");
-                    $ytdlpCommand = "yt-dlp -f 'bestvideo[height>=1080][height<2160]+bestaudio/best[height>=1080][height<2160]' 'https://www.youtube.com/watch?v={$videoId}' -o '{$outputFile}' --merge-output-format mp4 --no-playlist --no-check-certificate";
+                    $cookiesOption = $this->getCookiesOption();
+                    $ytdlpCommand = "yt-dlp -f 'bestvideo[height>=1080][height<2160]+bestaudio/best[height>=1080][height<2160]' {$cookiesOption} 'https://www.youtube.com/watch?v={$videoId}' -o '{$outputFile}' --merge-output-format mp4 --no-playlist --no-check-certificate";
                 } elseif ($format === 'mp4_sd') {
                     // SD quality with audio, preferring mp4 container
                     Log::info("Using SD quality format");
-                    $ytdlpCommand = "yt-dlp -f 'bestvideo[height<=720]+bestaudio/best[height<=720]' 'https://www.youtube.com/watch?v={$videoId}' -o '{$outputFile}' --merge-output-format mp4 --no-playlist --no-check-certificate";
+                    $cookiesOption = $this->getCookiesOption();
+                    $ytdlpCommand = "yt-dlp -f 'bestvideo[height<=720]+bestaudio/best[height<=720]' {$cookiesOption} 'https://www.youtube.com/watch?v={$videoId}' -o '{$outputFile}' --merge-output-format mp4 --no-playlist --no-check-certificate";
                 } else {
                     // Use the best available format
                     Log::info("Using best available format");
-                    $ytdlpCommand = "yt-dlp -f 'best' 'https://www.youtube.com/watch?v={$videoId}' -o '{$outputFile}' --merge-output-format mp4 --no-playlist --no-check-certificate";
+                    $cookiesOption = $this->getCookiesOption();
+                    $ytdlpCommand = "yt-dlp -f 'best' {$cookiesOption} 'https://www.youtube.com/watch?v={$videoId}' -o '{$outputFile}' --merge-output-format mp4 --no-playlist --no-check-certificate";
                 }
             }
             
@@ -317,7 +324,7 @@ class YouTubeService
                             'success' => true,
                             'message' => $statusText,
                             'download' => [
-                                'url' => url("/api/tools/media/download/{$filename}"), // No URL yet since download is in progress
+                                'url' => url("/tools/media/download/{$filename}"), // No URL yet since download is in progress
                                 'filename' => $filename.$extension,
                                 'mime_type' => $mimeType,
                                 'size' => $formattedSize,
@@ -460,7 +467,7 @@ class YouTubeService
             file_put_contents($metadataFile, json_encode($metadata, JSON_PRETTY_PRINT));
             
             // Create a download URL using the public route
-            $downloadUrl = url("/api/tools/media/download/{$filename}.{$extension}");
+            $downloadUrl = url("/tools/media/download/{$filename}.{$extension}");
             
             // Since we're downloading asynchronously, we don't have the file size yet
             // We'll return the download ID so the frontend can check progress
@@ -1793,6 +1800,57 @@ class YouTubeService
      * @param $filename
      * @return string|null Path to existing file or null if not found
      */
+    /**
+     * Get options for yt-dlp to bypass YouTube's anti-bot protection without using personal cookies
+     * 
+     * This uses safer approaches that won't risk account bans
+     *
+     * @return string
+     */
+    private function getCookiesOption()
+    {
+        $options = [];
+        
+        // Add rate limiting to appear less bot-like
+        $options[] = '--limit-rate 1.5M';
+        
+        // Add random sleep between requests
+        $options[] = '--sleep-requests 1';
+        $options[] = '--sleep-interval 3';
+        
+        // Add retries for resilience
+        $options[] = '--retries 3';
+        
+        // Add random user agent rotation
+        $userAgents = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:90.0) Gecko/20100101 Firefox/90.0',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 11.5; rv:90.0) Gecko/20100101 Firefox/90.0'
+        ];
+        $randomUserAgent = $userAgents[array_rand($userAgents)];
+        $options[] = "--user-agent '{$randomUserAgent}'";
+        
+        // Add referer to appear more legitimate
+        $options[] = "--referer 'https://www.google.com/'";
+        
+        // Only use cookies if explicitly enabled via config
+        $useCookies = env('YOUTUBE_USE_COOKIES', false);
+        
+        if ($useCookies) {
+            // Check if we have a cookies file configured
+            $cookiesFile = env('YOUTUBE_COOKIES_FILE');
+            if (!empty($cookiesFile) && file_exists($cookiesFile)) {
+                $options[] = "--cookies '{$cookiesFile}'";
+                Log::info('Using configured cookies file for YouTube download');
+            }
+        } else {
+            Log::info('Using cookie-less approach for YouTube download with anti-bot protection measures');
+        }
+        
+        return implode(' ', $options);
+    }
+    
     private function findExistingDownload($filename): ?string
     {
         // Set download directory

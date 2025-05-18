@@ -248,7 +248,7 @@ class MediaController extends Controller
                         
                         // Add download information to the response
                         $responseData['download'] = [
-                            'url' => url("/api/tools/media/download/{$filename}"),
+                            'url' => url("/tools/media/download/{$filename}"),
                             'filename' => $filename,
                             'mime_type' => $contentType,
                             'size' => $fileSize > 0 ? $this->formatBytes($fileSize) : 'Unknown',
