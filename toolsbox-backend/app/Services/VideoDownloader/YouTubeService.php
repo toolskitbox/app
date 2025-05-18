@@ -21,11 +21,11 @@ class YouTubeService
     /**
      * YouTubeService constructor
      * 
-     * @param ProxyManager $proxyManager
+     * @param ProxyManager|null $proxyManager
      */
-    public function __construct(ProxyManager $proxyManager)
+    public function __construct(ProxyManager $proxyManager = null)
     {
-        $this->proxyManager = $proxyManager;
+        $this->proxyManager = $proxyManager ?? app(ProxyManager::class);
     }
     
     /**
@@ -1567,8 +1567,11 @@ class YouTubeService
     {
         $options = [];
         
-        // First try to get a proxy from ProxyManager service
-        $randomProxy = $this->proxyManager->getRandomProxy();
+        // First try to get a proxy from ProxyManager service if available
+        $randomProxy = null;
+        if ($this->proxyManager) {
+            $randomProxy = $this->proxyManager->getRandomProxy();
+        }
         
         if (!empty($randomProxy)) {
             // Format: protocol://user:pass@host:port
