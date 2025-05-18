@@ -8,18 +8,19 @@ The application includes the following tool categories:
 
 ### Media Tools
 - YouTube / Dailymotion video downloader
-- Audio converter
-- Image resizer/compressor/converter
-- Video converter
+- Audio converter *(Coming Soon)*
+- Image tools (resizer/compressor/converter) *(Coming Soon)*
+- Video converter *(Coming Soon)*
 
 ### Text Tools
-- File converter (PDF to DOC, DOC to PDF, etc.)
+- File converter (PDF to DOC, DOC to PDF, etc.) *(Coming Soon)*
 - String length, hashing & encrypting
 - Word counter / character counter
 - Case converter (UPPERCASE, lowercase, Title Case)
 - Text difference checker (diff viewer)
 - Binary text converter
 - Stylish text generator (for Instagram/Facebook bios)
+- JWT Generator and Validator *(Coming Soon)*
 
 ### Web Tools
 - QR code generator & scanner
@@ -94,6 +95,9 @@ toolsbox/
 - Node.js and npm (for local development)
 - PHP 8.3 and Composer (for local development)
 
+### Feature Status
+Some features are marked as *(Coming Soon)* and are currently under development. These features have placeholders in the UI with a "Coming Soon" overlay and will be implemented in future updates.
+
 ### Installation
 
 1. Clone the repository:
@@ -146,3 +150,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [React](https://reactjs.org/)
 - [Laravel](https://laravel.com/)
 - [Docker](https://www.docker.com/)
+- [Draft.js](https://draftjs.org/) - For rich text editing
+
+## Recent Updates
+
+- Added JWT Generator tool (Coming Soon)
+- Implemented Draft.js WYSIWYG editor for the Online Notepad
+- Added "Coming Soon" indicators for features under development
+- Improved UI with responsive design
