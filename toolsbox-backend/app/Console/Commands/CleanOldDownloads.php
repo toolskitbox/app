@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class CleanOldDownloads extends Command
@@ -67,7 +66,7 @@ class CleanOldDownloads extends Command
                 $now = Carbon::now();
                 
                 // Check if file is older than specified hours
-//                if ($fileAge->diffInHours($now) >= $hours) {
+                if ($fileAge->diffInHours($now) >= $hours) {
                     $fileSize = $fileInfo->getSize();
                     $totalSize += $fileSize;
                     
@@ -81,7 +80,7 @@ class CleanOldDownloads extends Command
                         $this->error("Failed to delete: " . $fileInfo->getFilename());
                         Log::error("Failed to delete file: {$file}");
                     }
-//                }
+                }
                 
                 // Free up memory
                 unset($fileInfo);

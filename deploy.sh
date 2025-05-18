@@ -53,8 +53,12 @@ fi
 # ====================
 echo_message "Installing system dependencies..."
 
-# Update package lists
+# Update package lists and ensure repositories are properly configured
 apt-get update
+apt-get install -y software-properties-common
+
+# Add universe repository if not already added
+apt-add-repository -y universe
 
 # Install dependencies
 apt-get update && apt-get install -y \
@@ -88,7 +92,16 @@ apt-get update && \
 
 # Install Apache and PHP
 echo_message "Installing Apache and PHP..."
-apt-get install -y apache2 apache2-utils ssl-cert
+
+# Try to install Apache with detailed error reporting
+apt-cache policy apache2
+apt-get install -y apache2 apache2-utils || {
+  echo_error "Failed to install Apache. Trying alternative approach..."
+  # Add Apache repository explicitly
+  add-apt-repository -y ppa:ondrej/apache2
+  apt-get update
+  apt-get install -y apache2 apache2-utils
+}
 apt-get install -y php$PHP_VERSION php$PHP_VERSION-fpm php$PHP_VERSION-cli php$PHP_VERSION-common \
                    php$PHP_VERSION-mysql php$PHP_VERSION-zip php$PHP_VERSION-gd php$PHP_VERSION-mbstring \
                    php$PHP_VERSION-curl php$PHP_VERSION-xml php$PHP_VERSION-bcmath php$PHP_VERSION-json \
@@ -115,7 +128,6 @@ fi
 # Enable required Apache modules
 echo_message "Enabling Apache modules..."
 a2enmod rewrite
-a2enmod ssl
 a2enmod headers
 a2enmod proxy_fcgi
 a2enmod deflate

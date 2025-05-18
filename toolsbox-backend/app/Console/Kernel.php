@@ -13,9 +13,6 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
-        
-        // Clean downloaded files older than 1 hour every hour
-        $schedule->command('downloads:clean')->hourly();
     }
 
     /**
