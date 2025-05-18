@@ -136,6 +136,7 @@ a2enmod proxy_fcgi
 a2enmod deflate
 a2enmod expires
 a2enmod setenvif
+a2enmod ssl
 a2enconf php$PHP_VERSION-fpm
 
 # Check if required directories exist
@@ -238,10 +239,50 @@ echo_message "Configuring Apache virtual hosts..."
 echo_message "Found Apache configurations in project directory. Copying to sites-available..."
 cp ./apache-configs/*.conf /etc/apache2/sites-available/
 
+# Generate self-signed SSL certificates if they don't exist
+echo_message "Checking SSL certificates..."
+SSL_DIR="/etc/ssl"
+CERTS_DIR="$SSL_DIR/certs"
+PRIVATE_DIR="$SSL_DIR/private"
+
+# Create directories if they don't exist
+mkdir -p $CERTS_DIR
+mkdir -p $PRIVATE_DIR
+
+# Generate certificates for frontend domain if they don't exist
+if [ ! -f "$CERTS_DIR/$FRONTEND_DOMAIN.crt" ]; then
+  echo_message "Generating self-signed SSL certificate for $FRONTEND_DOMAIN..."
+  openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout "$PRIVATE_DIR/$FRONTEND_DOMAIN.key" \
+    -out "$CERTS_DIR/$FRONTEND_DOMAIN.crt" \
+    -subj "/C=US/ST=State/L=City/O=Organization/CN=$FRONTEND_DOMAIN"
+  
+  chmod 600 "$PRIVATE_DIR/$FRONTEND_DOMAIN.key"
+  chmod 644 "$CERTS_DIR/$FRONTEND_DOMAIN.crt"
+else
+  echo_message "SSL certificate for $FRONTEND_DOMAIN already exists."
+fi
+
+# Generate certificates for backend domain if they don't exist
+if [ ! -f "$CERTS_DIR/$BACKEND_DOMAIN.crt" ]; then
+  echo_message "Generating self-signed SSL certificate for $BACKEND_DOMAIN..."
+  openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout "$PRIVATE_DIR/$BACKEND_DOMAIN.key" \
+    -out "$CERTS_DIR/$BACKEND_DOMAIN.crt" \
+    -subj "/C=US/ST=State/L=City/O=Organization/CN=$BACKEND_DOMAIN"
+  
+  chmod 600 "$PRIVATE_DIR/$BACKEND_DOMAIN.key"
+  chmod 644 "$CERTS_DIR/$BACKEND_DOMAIN.crt"
+else
+  echo_message "SSL certificate for $BACKEND_DOMAIN already exists."
+fi
+
 # Enable sites
 echo_message "Enabling Apache sites..."
 a2ensite $FRONTEND_DOMAIN.conf
 a2ensite $BACKEND_DOMAIN.conf
+a2ensite $FRONTEND_DOMAIN-ssl.conf
+a2ensite $BACKEND_DOMAIN-ssl.conf
 
 # Restart Apache
 echo_message "Restarting Apache..."
