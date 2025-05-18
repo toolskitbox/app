@@ -29,9 +29,16 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         $this->routes(function () {
-            Route::middleware('api')
-                ->prefix('api')
-                ->group(base_path('routes/api.php'));
+            // Only apply the 'api' prefix in local environment
+            // In production with api.toolskitbox.com, we don't need the prefix
+            $apiRoutes = Route::middleware('api');
+            
+            // Check if we're in local environment
+            if (app()->environment('local')) {
+                $apiRoutes->prefix('api');
+            }
+            
+            $apiRoutes->group(base_path('routes/api.php'));
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
