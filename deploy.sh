@@ -104,10 +104,13 @@ apt-get install -y apache2 apache2-utils || {
 }
 apt-get install -y php$PHP_VERSION php$PHP_VERSION-fpm php$PHP_VERSION-cli php$PHP_VERSION-common \
                    php$PHP_VERSION-mysql php$PHP_VERSION-zip php$PHP_VERSION-gd php$PHP_VERSION-mbstring \
-                   php$PHP_VERSION-curl php$PHP_VERSION-xml php$PHP_VERSION-bcmath php$PHP_VERSION-json \
+                   php$PHP_VERSION-curl php$PHP_VERSION-xml php$PHP_VERSION-bcmath \
                    php$PHP_VERSION-intl php$PHP_VERSION-readline php$PHP_VERSION-ldap \
                    php$PHP_VERSION-msgpack php$PHP_VERSION-igbinary php$PHP_VERSION-redis php$PHP_VERSION-pdo_mysql \
                    php$PHP_VERSION-exif php$PHP_VERSION-pcntl 
+
+# Install Apache PHP module
+apt-get install libapache2-mod-php8.3
 
 # Clean apt installations
 apt-get clean && rm -rf /var/lib/apt/lists/*
