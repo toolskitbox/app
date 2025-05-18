@@ -1,0 +1,125 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+/toolsbox-frontend/node_modules
+/toolsbox-backend/node_modules
+
+# Testing
+/coverage
+/toolsbox-frontend/coverage
+/toolsbox-backend/coverage
+
+# Production
+/build
+/toolsbox-frontend/build
+/toolsbox-backend/build
+/dist
+/toolsbox-frontend/dist
+/toolsbox-backend/dist
+
+# Misc
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+.env*.development
+.env*.production
+.env*.test
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor directories and files
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-workspace
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Docker volumes
+/docker/volumes
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Cache directories
+.cache
+.parcel-cache
+.next
+.nuxt
+.vuepress/dist
+.temp
+.docusaurus
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# Laravel specific
+/toolsbox-backend/bootstrap/cache/*
+!/toolsbox-backend/bootstrap/cache/.gitignore
+/toolsbox-backend/storage/app/*
+!/toolsbox-backend/storage/app/.gitignore
+!/toolsbox-backend/storage/app/public/
+/toolsbox-backend/storage/app/public/*
+!/toolsbox-backend/storage/app/public/.gitignore
+/toolsbox-backend/storage/framework/cache/*
+!/toolsbox-backend/storage/framework/cache/.gitignore
+!/toolsbox-backend/storage/framework/cache/data/
+/toolsbox-backend/storage/framework/cache/data/*
+!/toolsbox-backend/storage/framework/cache/data/.gitignore
+/toolsbox-backend/storage/framework/sessions/*
+!/toolsbox-backend/storage/framework/sessions/.gitignore
+/toolsbox-backend/storage/framework/testing/*
+!/toolsbox-backend/storage/framework/testing/.gitignore
+/toolsbox-backend/storage/framework/views/*
+!/toolsbox-backend/storage/framework/views/.gitignore
+/toolsbox-backend/storage/logs/*
+!/toolsbox-backend/storage/logs/.gitignore
+/toolsbox-backend/public/hot
+/toolsbox-backend/public/storage
+/toolsbox-backend/vendor
+/toolsbox-backend/.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+
+# Local Netlify folder
+.netlify

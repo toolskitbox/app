@@ -1,0 +1,63 @@
+services:
+  # Frontend React Application
+  frontend:
+    build:
+      context: ./toolsbox-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3000"
+    volumes:
+      - ./toolsbox-frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    environment:
+      - REACT_APP_API_URL=http://localhost:8080/api
+    networks:
+      - toolsbox-network
+
+  # Backend Laravel Application
+  backend:
+    build:
+      context: ./toolsbox-backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8000"
+    volumes:
+      - ./toolsbox-backend:/var/www/html
+      - /var/www/html/vendor
+    depends_on:
+      - db
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=toolsbox
+      - DB_USERNAME=toolsbox
+      - DB_PASSWORD=toolsbox_password
+    env_file:
+      - toolsbox-backend/.env
+    networks:
+      - toolsbox-network
+
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_DATABASE=toolsbox
+      - MYSQL_USER=toolsbox
+      - MYSQL_PASSWORD=toolsbox_password
+      - MYSQL_ROOT_PASSWORD=root_password
+    volumes:
+      - toolsbox-db-data:/var/lib/mysql
+    networks:
+      - toolsbox-network
+
+networks:
+  toolsbox-network:
+    driver: bridge
+
+volumes:
+  toolsbox-db-data:
