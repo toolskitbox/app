@@ -29,6 +29,9 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
 // Public media download route
 Route::get('/tools/media/download/{filename}', [MediaController::class, 'serveDownload']);
 
+// Public URL shortner redirect
+Route::get('/url-shortener/{code}', [WebToolsController::class, 'redirectUrl']);
+
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     // User info
@@ -54,7 +57,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Web Tools (Backend tools)
     Route::prefix('tools/web')->group(function () {
         Route::post('/url-shortener', [WebToolsController::class, 'shortenUrl']);
-        Route::get('/url-shortener/{code}', [WebToolsController::class, 'redirectUrl']);
         Route::post('/ip-lookup', [WebToolsController::class, 'lookupIp']);
     });
 });
