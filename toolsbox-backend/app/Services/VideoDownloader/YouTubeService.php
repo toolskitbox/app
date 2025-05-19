@@ -1575,9 +1575,39 @@ class YouTubeService
         
         if (!empty($randomProxy)) {
             // Format: protocol://user:pass@host:port
-            $options[] = "--proxy 'https://{$randomProxy}'";
-            Log::info("Using proxy from ProxyManager for YouTube download: https://*****");
+            $options[] = "--proxy 'http://{$randomProxy}'";
+            Log::info("Using WebShare proxy for YouTube download");
         }
+        
+        // Advanced anti-bot detection options
+        
+        // 1. Geo-bypass options
+        $options[] = '--geo-bypass';
+        $options[] = '--geo-bypass-country US';
+        
+        // 2. Add advanced extractor arguments to appear as a legitimate browser
+        $options[] = '--extractor-args "youtube:player_client=android"';
+        
+        // 3. Add a random sleep between requests to appear more human-like
+        $randomSleep = rand(1, 5);
+        $options[] = "--sleep-requests {$randomSleep}";
+        $options[] = '--sleep-interval 3';
+        
+        // 4. Add multiple retries with exponential backoff
+        $options[] = '--retries 10';
+        $options[] = '--file-access-retries 10';
+        $options[] = '--fragment-retries 10';
+        $options[] = '--retry-sleep-functions exponential';
+        
+        // 5. Add concurrent downloads to speed up the process
+        $options[] = '--concurrent-fragments 5';
+        
+        // 6. Add throttled rate to avoid triggering rate limits
+        $options[] = '--throttled-rate 100K';
+        
+        // 7. Add verbose progress reporting
+        $options[] = '--progress';
+        $options[] = '--newline';
         
         // Add rate limiting to appear less bot-like
         $options[] = '--limit-rate 1.5M';

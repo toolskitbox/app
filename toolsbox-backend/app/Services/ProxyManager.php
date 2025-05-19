@@ -42,6 +42,9 @@ class ProxyManager
      */
     private function fetchProxies()
     {
+        // Return WebShare proxies directly
+        return $this->fetchFromWebshare();
+
         $proxies = [];
         
         // Try multiple sources to ensure we get working proxies
@@ -76,7 +79,7 @@ class ProxyManager
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Token ' . $apiKey
-            ])->get('https://proxy.webshare.io/api/v2/proxy/list/');
+            ])->get('https://proxy.webshare.io/api/v2/proxy/list?mode=direct');
             
             if ($response->successful()) {
                 $results = $response->json()['results'] ?? [];
@@ -84,7 +87,7 @@ class ProxyManager
                 
                 foreach ($results as $proxy) {
                     $proxies[] = $proxy['username'] . ':' . $proxy['password'] . '@' . 
-                               $proxy['proxy_address'] . ':' . $proxy['ports']['http'];
+                               $proxy['proxy_address'] . ':' . $proxy['port'];
                 }
                 
                 Log::info('Fetched ' . count($proxies) . ' proxies from Webshare');

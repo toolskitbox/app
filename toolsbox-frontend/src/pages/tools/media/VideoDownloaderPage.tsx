@@ -132,6 +132,12 @@ const VideoDownloaderPage: React.FC = () => {
       return;
     }
     
+    // Block YouTube downloads completely
+    if (isYoutubeUrl(url)) {
+      setError('YouTube video downloads are not supported at this time. Please try a Dailymotion video instead.');
+      return; // Stop here and don't attempt to download
+    }
+    
     setLoading(true);
     setError(null);
     
@@ -484,6 +490,11 @@ const VideoDownloaderPage: React.FC = () => {
     return youtubeRegex.test(url) || dailymotionRegex.test(url);
   };
   
+  const isYoutubeUrl = (url: string): boolean => {
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+/;
+    return youtubeRegex.test(url);
+  };
+  
   return (
     <MotionContainer
       maxWidth="lg"
@@ -510,7 +521,7 @@ const VideoDownloaderPage: React.FC = () => {
           color="text.secondary"
           sx={{ maxWidth: 800, mx: 'auto' }}
         >
-          Download videos from YouTube, Dailymotion, and other platforms in various formats and quality levels.
+          Download videos from Dailymotion, and other platforms in various formats and quality levels. Youtube videos will be supported later.
         </Typography>
       </Box>
       
