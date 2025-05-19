@@ -30,7 +30,7 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
 Route::get('/tools/media/download/{filename}', [MediaController::class, 'serveDownload']);
 
 // Public URL shortner redirect
-Route::get('/url-shortener/{code}', [WebToolsController::class, 'redirectUrl']);
+Route::get('/tools/web/url-shortener/{code}', [WebToolsController::class, 'redirectUrl']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
